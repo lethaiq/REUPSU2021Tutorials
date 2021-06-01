@@ -105,6 +105,9 @@ train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
 train_data, valid_data = train_data.split(split_ratio=0.3, random_state=random.seed(SEED))
 train_data, valid_data = train_data.split(split_ratio=0.7, random_state=random.seed(SEED))
 
+print("Training set", len(train_data))
+print("Validation set", len(valid_data))
+print("Test set", len(test_data))
 
 print("Building vocabulary...")
 TEXT.build_vocab(train_data, 
