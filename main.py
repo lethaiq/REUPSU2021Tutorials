@@ -9,7 +9,7 @@ import torch.optim as optim
 import time
 ## Borrow from https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/4%20-%20Convolutional%20Sentiment%20Analysis.ipynb
 
-class CNN1d(nn.Module):
+class CNN(nn.Module):
     def __init__(self, vocab_size, embedding_dim, n_filters, filter_sizes, output_dim, 
                  dropout, pad_idx):
         super().__init__()
