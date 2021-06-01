@@ -99,11 +99,12 @@ print("Loading data...")
 # TEXT = data.Field(tokenize = 'spacy', 
 #                   tokenizer_language = 'en_core_web_sm',
 #                   batch_first = True)
-TEXT = data.Field(tokenize = None, 
-                  batch_first = True)
+TEXT = data.Field(tokenize=None, batch_first = True)
 LABEL = data.LabelField(dtype = torch.float)
 train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
-train_data, valid_data = train_data.split(random_state = random.seed(SEED))
+train_data, valid_data = train_data.split(split_ratio=0.3, random_state=random.seed(SEED))
+train_data, valid_data = train_data.split(split_ratio=0.7, random_state=random.seed(SEED))
+
 
 print("Building vocabulary...")
 TEXT.build_vocab(train_data, 
