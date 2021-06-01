@@ -106,7 +106,7 @@ train_data, valid_data = train_data.split(random_state = random.seed(SEED))
 print("Building vocabulary...")
 TEXT.build_vocab(train_data, 
                  max_size = MAX_VOCAB_SIZE, 
-                 vectors = "glove.6B.100d", 
+                 vectors = "fasttext.simple.300d", 
                  unk_init = torch.Tensor.normal_)
 LABEL.build_vocab(train_data)
 
