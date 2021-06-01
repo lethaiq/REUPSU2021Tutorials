@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import time
-import string
 ## Borrow from https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/4%20-%20Convolutional%20Sentiment%20Analysis.ipynb
 
 class CNN1d(nn.Module):
@@ -97,8 +96,10 @@ torch.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 
 print("Loading data...")
-TEXT = data.Field(tokenize = string.split, 
-                  tokenizer_language = 'en_core_web_sm',
+# TEXT = data.Field(tokenize = 'spacy', 
+#                   tokenizer_language = 'en_core_web_sm',
+#                   batch_first = True)
+TEXT = data.Field(tokenize = None, 
                   batch_first = True)
 LABEL = data.LabelField(dtype = torch.float)
 train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
