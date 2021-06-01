@@ -83,7 +83,7 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 SEED = 1234
-MAX_VOCAB_SIZE = 25_000
+MAX_VOCAB_SIZE = 25000
 BATCH_SIZE = 64
 EMBEDDING_DIM = 300
 N_FILTERS = 100
