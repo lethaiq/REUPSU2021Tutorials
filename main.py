@@ -7,6 +7,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import time
+from torch.utils.tensorboard import SummaryWriter
+writer = SummaryWriter()
 ## Borrow from https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/4%20-%20Convolutional%20Sentiment%20Analysis.ipynb
 
 class CNN(nn.Module):
@@ -157,6 +159,10 @@ for epoch in range(N_EPOCHS):
     print(f'Epoch: {epoch+1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
     print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc*100:.2f}%')
     print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc*100:.2f}%')
+    writer.add_scalar("Loss/train", train_loss, epoch)
+    writer.add_scalar("Loss/validation", valid_loss, epoch)
+    writer.add_scalar("Accuracy/train", train_acc*100, epoch)
+    writer.add_scalar("Accuracy/validation", valid_acc*100, epoch)
 
 model.load_state_dict(torch.load('tut4-model.pt'))
 test_loss, test_acc = evaluate(model, test_iterator, criterion)
