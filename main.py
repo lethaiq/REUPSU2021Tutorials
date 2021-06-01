@@ -9,7 +9,6 @@ import torch.optim as optim
 import time
 ## Borrow from https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/4%20-%20Convolutional%20Sentiment%20Analysis.ipynb
 
-
 class CNN1d(nn.Module):
     def __init__(self, vocab_size, embedding_dim, n_filters, filter_sizes, output_dim, 
                  dropout, pad_idx):
@@ -31,65 +30,6 @@ class CNN1d(nn.Module):
         pooled = [F.max_pool1d(conv, conv.shape[2]).squeeze(2) for conv in conved]
         cat = self.dropout(torch.cat(pooled, dim = 1))
         return self.fc(cat)
-
-
-SEED = 1234
-MAX_VOCAB_SIZE = 25_000
-BATCH_SIZE = 64
-
-random.seed(SEED)
-np.random.seed(SEED)
-torch.manual_seed(SEED)
-torch.backends.cudnn.deterministic = True
-
-TEXT = data.Field(tokenize = 'spacy', 
-                  tokenizer_language = 'en_core_web_sm',
-                  batch_first = True)
-LABEL = data.LabelField(dtype = torch.float)
-train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
-train_data, valid_data = train_data.split(random_state = random.seed(SEED))
-
-
-TEXT.build_vocab(train_data, 
-                 max_size = MAX_VOCAB_SIZE, 
-                 vectors = "glove.6B.100d", 
-                 unk_init = torch.Tensor.normal_)
-LABEL.build_vocab(train_data)
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
-    (train_data, valid_data, test_data), 
-    batch_size = BATCH_SIZE, 
-    device = device)
-
-INPUT_DIM = len(TEXT.vocab)
-EMBEDDING_DIM = 100
-N_FILTERS = 100
-FILTER_SIZES = [3,4,5]
-OUTPUT_DIM = 1
-DROPOUT = 0.5
-PAD_IDX = TEXT.vocab.stoi[TEXT.pad_token]
-
-model = CNN(INPUT_DIM, EMBEDDING_DIM, N_FILTERS, FILTER_SIZES, OUTPUT_DIM, DROPOUT, PAD_IDX)
-
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-print(f'The model has {count_parameters(model):,} trainable parameters')
-
-pretrained_embeddings = TEXT.vocab.vectors
-model.embedding.weight.data.copy_(pretrained_embeddings)
-UNK_IDX = TEXT.vocab.stoi[TEXT.unk_token]
-model.embedding.weight.data[UNK_IDX] = torch.zeros(EMBEDDING_DIM)
-model.embedding.weight.data[PAD_IDX] = torch.zeros(EMBEDDING_DIM)
-
-
-optimizer = optim.Adam(model.parameters())
-criterion = nn.BCEWithLogitsLoss()
-model = model.to(device)
-criterion = criterion.to(device)
-
 
 def binary_accuracy(preds, y):
     """
@@ -137,8 +77,66 @@ def evaluate(model, iterator, criterion):
             epoch_acc += acc.item()
     return epoch_loss / len(iterator), epoch_acc / len(iterator)
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+SEED = 1234
+MAX_VOCAB_SIZE = 25_000
+BATCH_SIZE = 64
+EMBEDDING_DIM = 100
+N_FILTERS = 100
+FILTER_SIZES = [3,4,5]
+OUTPUT_DIM = 1
+DROPOUT = 0.5
 N_EPOCHS = 5
+
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.backends.cudnn.deterministic = True
+
+print("Loading data...")
+TEXT = data.Field(tokenize = 'spacy', 
+                  tokenizer_language = 'en_core_web_sm',
+                  batch_first = True)
+LABEL = data.LabelField(dtype = torch.float)
+train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
+train_data, valid_data = train_data.split(random_state = random.seed(SEED))
+
+print("Building vocabulary...")
+TEXT.build_vocab(train_data, 
+                 max_size = MAX_VOCAB_SIZE, 
+                 vectors = "glove.6B.100d", 
+                 unk_init = torch.Tensor.normal_)
+LABEL.build_vocab(train_data)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
+    (train_data, valid_data, test_data), 
+    batch_size = BATCH_SIZE, 
+    device = device)
+
+INPUT_DIM = len(TEXT.vocab)
+PAD_IDX = TEXT.vocab.stoi[TEXT.pad_token]
+
+print("Preparing model...")
+model = CNN(INPUT_DIM, EMBEDDING_DIM, N_FILTERS, FILTER_SIZES, OUTPUT_DIM, DROPOUT, PAD_IDX)
+print(f'The model has {count_parameters(model):,} trainable parameters')
+
+pretrained_embeddings = TEXT.vocab.vectors
+model.embedding.weight.data.copy_(pretrained_embeddings)
+UNK_IDX = TEXT.vocab.stoi[TEXT.unk_token]
+model.embedding.weight.data[UNK_IDX] = torch.zeros(EMBEDDING_DIM)
+model.embedding.weight.data[PAD_IDX] = torch.zeros(EMBEDDING_DIM)
+
+
+optimizer = optim.Adam(model.parameters())
+criterion = nn.BCEWithLogitsLoss()
+model = model.to(device)
+criterion = criterion.to(device)
+
+print("Training...")
 best_valid_loss = float('inf')
 for epoch in range(N_EPOCHS):
     start_time = time.time()
