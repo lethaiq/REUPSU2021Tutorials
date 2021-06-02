@@ -90,7 +90,7 @@ N_FILTERS = 100
 FILTER_SIZES = [3,4,5]
 OUTPUT_DIM = 1
 DROPOUT = 0.5
-N_EPOCHS = 5
+N_EPOCHS = 30
 
 random.seed(SEED)
 np.random.seed(SEED)
@@ -140,7 +140,7 @@ model.embedding.weight.data[UNK_IDX] = torch.zeros(EMBEDDING_DIM)
 model.embedding.weight.data[PAD_IDX] = torch.zeros(EMBEDDING_DIM)
 
 
-optimizer = optim.Adam(model.parameters())
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
 criterion = nn.BCEWithLogitsLoss()
 model = model.to(device)
 criterion = criterion.to(device)
