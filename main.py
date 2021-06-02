@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import time
+import sys
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 ## Borrow from https://github.com/bentrevett/pytorch-sentiment-analysis/blob/master/4%20-%20Convolutional%20Sentiment%20Analysis.ipynb
@@ -84,7 +85,7 @@ def count_parameters(model):
 
 SEED = 1234
 MAX_VOCAB_SIZE = 25000
-BATCH_SIZE = 64
+BATCH_SIZE = int(sys.argv[1])
 EMBEDDING_DIM = 300
 N_FILTERS = 100
 FILTER_SIZES = [3,4,5]
