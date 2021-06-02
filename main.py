@@ -130,7 +130,7 @@ train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
 INPUT_DIM = len(TEXT.vocab)
 PAD_IDX = TEXT.vocab.stoi[TEXT.pad_token]
 
-print("Preparing model...")
+print("Preparing model...with batch size", BATCH_SIZE)
 model = CNN(INPUT_DIM, EMBEDDING_DIM, N_FILTERS, FILTER_SIZES, OUTPUT_DIM, DROPOUT, PAD_IDX)
 print(f'The model has {count_parameters(model):,} trainable parameters')
 
