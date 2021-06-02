@@ -91,7 +91,7 @@ N_FILTERS = 100
 FILTER_SIZES = [3,4,5]
 OUTPUT_DIM = 1
 DROPOUT = 0.5
-N_EPOCHS = 20
+N_EPOCHS = 10
 
 random.seed(SEED)
 np.random.seed(SEED)
